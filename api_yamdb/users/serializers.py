@@ -1,22 +1,44 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from users.models import User
-from users.tokens import check_confirmation_code, account_activation_token
+from users.models import User, roles
+from users.tokens import account_activation_token
+
+
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=150, required=True)
+    email = serializers.EmailField(required=True)
+    first_name = serializers.CharField(max_length=150, required=False)
+    last_name = serializers.CharField(max_length=150, required=False)
+    bio = serializers.CharField(required=False)
+    role = serializers.ChoiceField(choices=roles, default='user',
+                                   required=False)
+
+    class Meta:
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role')
+        model = User
+
+    def validate(self, data):
+        if data.get('username') == 'me':
+            raise serializers.ValidationError(
+                'Пользователь не может иметь такое имя')
+
+        if User.objects.filter(email=data.get('email')).exists():
+            raise serializers.ValidationError(
+                'Пользователь с такой почтой уже существует')
+
+        if User.objects.filter(username=data.get('username')).exists():
+            raise serializers.ValidationError(
+                'Пользователь с таким именем уже существует')
+        return data
 
 
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField()
 
-    def validate(self, data):
-        if data['username'] == 'me':
-            raise serializers.ValidationError(
-                'Пользователь не может иметь такое имя')
-        if User.objects.filter(username=data['username']).exists():
-            raise serializers.ValidationError(
-                'Пользователь с таким именем уже существует')
-        return data
+    validate = UserSerializer.validate
 
 
 class GetTokenSerializer(serializers.Serializer):
