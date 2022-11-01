@@ -1,7 +1,10 @@
+from turtle import title
 from django.db import models
 
 from .validators import year_validator
+from ..users.models import User
 
+CHOICES_RATE = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
 class Category(models.Model):
     """Категории произведений
@@ -87,3 +90,55 @@ class Title(models.Model):
 
     def __str__(self):
         return f'{self.name[:20]}, {str(self.year)}, {self.category}'
+
+
+class Review(models.Model):
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+    text = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+
+
+class Rating(models.Model):
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='rating',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='rating',
+    )
+    estimation = models.IntegerField(
+        choices=CHOICES_RATE
+    )
+
+    class Meta:
+        constraints = [models.UniqueConstraint(
+            fields='author',
+            name='unique_rate')
+        ]
+
+
+class Comment(models.Model):
+    rewiew = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+    text = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
