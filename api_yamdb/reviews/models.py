@@ -110,6 +110,7 @@ class Review(models.Model):
             fields='author',
             name='unique_review')
         ]
+        ordering = '-created'
 
 
 class Rating(models.Model):
@@ -147,3 +148,6 @@ class Comment(models.Model):
     )
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = '-created'
