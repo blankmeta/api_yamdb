@@ -1,6 +1,6 @@
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import status, generics
+from rest_framework import status, generics, filters
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.permissions import IsAuthenticated
@@ -8,11 +8,14 @@ from rest_framework.response import Response
 
 from .models import User
 from .permissions import AdminOrSuperUser, IsAdminOrSuperUser, IsAuthor
-from .serializers import SignUpSerializer, GetTokenSerializer, UserSerializer
+from .serializers import (SignUpSerializer, GetTokenSerializer, UserSerializer,
+                          UserPatchSerializer)
 from .tokens import get_tokens_for_user, account_activation_token
 
 
 class UserList(generics.ListCreateAPIView):
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated, AdminOrSuperUser,)
@@ -23,6 +26,23 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated, IsAdminOrSuperUser or IsAuthor,)
+
+    def update(self, request, *args, **kwargs):
+        # Переопределяем сериализатор, если роль - юзер
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data,
+                                         partial=partial)
+        if self.request.user.role == 'user':
+            serializer = UserPatchSerializer(instance, data=self.request.data,
+                                             partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
 
     def get_object(self):
         username = self.kwargs.get('username')

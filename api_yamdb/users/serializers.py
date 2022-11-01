@@ -34,6 +34,11 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
 
+class UserPatchSerializer(UserSerializer):
+    role = serializers.ChoiceField(choices=roles, default='user',
+                                   required=False, read_only=True)
+
+
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField()

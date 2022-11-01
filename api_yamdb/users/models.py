@@ -19,3 +19,6 @@ class User(AbstractUser):
         default='user',
         max_length=10,
     )
+
+    class Meta:
+        ordering = ['id']
