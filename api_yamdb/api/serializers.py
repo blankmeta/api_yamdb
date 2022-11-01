@@ -15,3 +15,7 @@ class GenreSerializer(serializers.ModelField):
     class Meta:
         model = Genre
         fields = '__all__'
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    genre = 
