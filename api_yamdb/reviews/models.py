@@ -6,6 +6,9 @@ from ..users.models import User
 
 CHOICES_RATE = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
+LINE_SLICE = 20
+
+
 class Category(models.Model):
     """Категории произведений
 
@@ -27,12 +30,12 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.name[:20]
+        return self.name[:LINE_SLICE]
 
 
 class Genre(models.Model):
     """Жанр произведения
-    
+
     Произведения делятся на жанры из числа предустановленных.
     Список жанров может быть расширен администратором.
     """
@@ -51,7 +54,7 @@ class Genre(models.Model):
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
-        return self.name[:20]
+        return self.name[:LINE_SLICE]
 
 
 class Title(models.Model):
@@ -89,7 +92,7 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return f'{self.name[:20]}, {str(self.year)}, {self.category}'
+        return f'{self.name[:LINE_SLICE]}, {str(self.year)}, {self.category}'
 
 
 class Review(models.Model):
@@ -151,3 +154,4 @@ class Comment(models.Model):
 
     class Meta:
         ordering = '-created'
+
