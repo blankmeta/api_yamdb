@@ -99,12 +99,12 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='comments',
+        related_name='reviews',
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='comments',
+        related_name='reviews',
     )
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
