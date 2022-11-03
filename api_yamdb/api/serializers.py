@@ -24,7 +24,9 @@ from reviews.models import Review, Comment
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,
-                                          slug_field='username')
+                                          slug_field='username',
+                                          default=(serializers
+                                                   .CurrentUserDefault()))
 
     class Meta:
         fields = '__all__'
@@ -33,7 +35,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Review.objects.all(),
-                fields=('author',)
+                fields=('author', 'title')
             )
         ]
 
@@ -54,7 +56,7 @@ class RatingSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Review.objects.all(),
-                fields=('author',)
+                fields=('author', 'title')
             )
         ]
 
