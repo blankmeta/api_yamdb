@@ -1,10 +1,12 @@
+from statistics import mean
+
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 
-from reviews.models import Review, Rating, Comment
+from reviews.models import Review
 from reviews.models import Title
-from users.permissions import IsAuthor
-from .serializers import ReviewSerializer
+from users.permissions import AuthorOrReadOnly
+from .serializers import ReviewSerializer, RatingSerializer, CommentSerializer
 
 
 # Create your views here.
@@ -21,7 +23,7 @@ from .serializers import ReviewSerializer
 # 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthor,)
+    permission_classes = (AuthorOrReadOnly,)
 
     def get_queryset(self):
         title_id = self.kwargs['title_id']
@@ -36,4 +38,34 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class RatingViewSet(viewsets.ModelViewSet):
-    pass
+    serializer_class = RatingSerializer
+    permission_classes = (AuthorOrReadOnly,)
+
+    def get_queryset(self):
+        title_id = self.kwargs['title_id']
+        title = get_object_or_404(Title, pk=title_id)
+        estimations = title.rating.all()
+        rate_avg = mean(estimations)
+        return rate_avg
+
+    def perform_create(self, serializer):
+        title_id = self.kwargs['title_id']
+        title = get_object_or_404(Title, pk=title_id)
+        serializer.save(author=self.request.user,
+                        title=title)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = (AuthorOrReadOnly,)
+
+    def get_queryset(self):
+        review_id = self.kwargs['review_id']
+        review = get_object_or_404(Review, pk=review_id)
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs['review_id']
+        review = get_object_or_404(Review, pk=review_id)
+        serializer.save(author=self.request.user,
+                        review=review)

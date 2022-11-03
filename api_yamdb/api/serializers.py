@@ -1,25 +1,25 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from reviews.models import Category, Genre, Title, Review, Rating, Comment
+from reviews.models import Review, Comment
 
 
-class CategorySerializer(serializers.Model):
+# class CategorySerializer(serializers.Model):
     
-    class Meta:
-        model = Category
-        fields = '__all__'
+#     class Meta:
+#         model = Category
+#         fields = '__all__'
 
 
-class GenreSerializer(serializers.ModelField):
+# class GenreSerializer(serializers.ModelField):
 
-    class Meta:
-        model = Genre
-        fields = '__all__'
+#     class Meta:
+#         model = Genre
+#         fields = '__all__'
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    # genre = 
+# class TitleSerializer(serializers.ModelSerializer):
+#     # genre = 
  
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -41,7 +41,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         if data['author'] == self.context.get('request').user:
             raise serializers.ValidationError('Вы уже оставляли отзыв')
         return data
-
 
 
 class RatingSerializer(serializers.ModelSerializer):

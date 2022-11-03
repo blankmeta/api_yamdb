@@ -1,4 +1,3 @@
-from turtle import title
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -14,7 +13,7 @@ class Category(models.Model):
     Произведения делятся на категории: «Книги», «Фильмы», «Музыка».
     Список категорий может быть расширен администратором.
     """
-    name =  models.CharField(
+    name = models.CharField(
         'Название категории',
         max_length=200
     )
@@ -38,7 +37,7 @@ class Genre(models.Model):
     Произведения делятся на жанры из числа предустановленных.
     Список жанров может быть расширен администратором.
     """
-    name =  models.CharField(
+    name = models.CharField(
         'Название жанра',
         max_length=200
     )
@@ -109,6 +108,7 @@ class Review(models.Model):
     )
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         constraints = [models.UniqueConstraint(
             fields=['author, title'],
@@ -155,4 +155,3 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('-created',)
-

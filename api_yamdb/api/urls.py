@@ -9,6 +9,11 @@ router_v1 = routers.DefaultRouter()
 
 router_v1.register(r'titles/(?P<title_id>\d+)/reviews', ReviewViewSet,
                    basename=r'titles/(?P<title_id>\d+)/reviews')
+router_v1.register((r'titles/(?P<title_id>\d+)/reviews/'
+                    r'(?P<review_id>\d+)/comments'),
+                   ReviewViewSet,
+                   basename=(r'titles/(?P<title_id>\d+)/reviews/'
+                             r'(?P<review_id>\d+)/comments'))
 
 
 urlpatterns = [
