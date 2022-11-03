@@ -19,7 +19,7 @@ class GenreSerializer(serializers.ModelField):
         fields = '__all__'
 
 
-class TitleSerializer(serializers.ModelSerializer):
+"""class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField('get_rating')
     category = serializers.SlugRelatedField(
     queryset=Category.objects.all(), slug_field='slug')
@@ -37,7 +37,7 @@ class TitleSerializer(serializers.ModelSerializer):
         if not rating:
             return rating
         return round(rating, 1)
-
+"""
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,
