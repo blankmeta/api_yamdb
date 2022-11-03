@@ -1,9 +1,9 @@
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 
-from ..reviews.models import Review, Rating, Comment
-from ..reviews.models import Title
-from ..users.permissions import IsAuthor
+from reviews.models import Review, Rating, Comment
+from reviews.models import Title
+from users.permissions import IsAuthor
 from .serializers import ReviewSerializer
 
 
@@ -33,3 +33,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, pk=title_id)
         serializer.save(author=self.request.user,
                         title=title)
+
+
+class RatingViewSet(viewsets.ModelViewSet):
+    pass

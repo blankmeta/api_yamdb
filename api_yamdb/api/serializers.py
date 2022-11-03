@@ -20,7 +20,7 @@ class GenreSerializer(serializers.ModelField):
 
 class TitleSerializer(serializers.ModelSerializer):
     # genre = 
-    pass
+ 
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,

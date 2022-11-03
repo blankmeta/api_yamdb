@@ -1,10 +1,9 @@
 from turtle import title
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from .validators import year_validator
-from ..users.models import User
-
-CHOICES_RATE = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+from users.models import User
 
 LINE_SLICE = 20
 
@@ -76,12 +75,14 @@ class Title(models.Model):
     genre = models.ForeignKey(
         Genre,
         on_delete=models.SET_NULL,
+        null=True,
         blank=True,
         verbose_name='Жанр произведения'
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
+        null=True,
         blank=True,
         verbose_name='Категория произведения'
     )
@@ -110,10 +111,10 @@ class Review(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     class Meta:
         constraints = [models.UniqueConstraint(
-            fields='author',
+            fields=['author, title'],
             name='unique_review')
         ]
-        ordering = '-created'
+        ordering = ('-created',)
 
 
 class Rating(models.Model):
@@ -128,12 +129,12 @@ class Rating(models.Model):
         related_name='rating',
     )
     estimation = models.IntegerField(
-        choices=CHOICES_RATE
+        validators=[MinValueValidator(0), MaxValueValidator(10)]
     )
 
     class Meta:
         constraints = [models.UniqueConstraint(
-            fields='author',
+            fields=['author, title'],
             name='unique_rate')
         ]
 
@@ -153,5 +154,5 @@ class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = '-created'
+        ordering = ('-created',)
 
