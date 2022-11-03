@@ -106,12 +106,12 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews',
     )
-    text = models.TextField()
+    text = models.TextField(max_length=300)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [models.UniqueConstraint(
-            fields=['author, title'],
+            fields=['author', 'title'],
             name='unique_review')
         ]
         ordering = ('-created',)
@@ -134,7 +134,7 @@ class Rating(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(
-            fields=['author, title'],
+            fields=['author', 'title'],
             name='unique_rate')
         ]
 
@@ -150,8 +150,9 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments',
     )
-    text = models.TextField()
+    text = models.TextField(max_length=300)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ('-created',)
+
