@@ -1,26 +1,33 @@
 from statistics import mean
 
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
+from rest_framework.pagination import LimitOffsetPagination
 from django.shortcuts import get_object_or_404
 
-from reviews.models import Review
-from reviews.models import Title
-from users.permissions import AuthorOrReadOnly
-from .serializers import ReviewSerializer, RatingSerializer, CommentSerializer
+from reviews.models import Review, Title, Category, Genre
+from users.permissions import AuthorOrReadOnly, AdminOrSuperUser
+from .serializers import (ReviewSerializer, RatingSerializer, CommentSerializer,
+                          CategorySerializer, GenreSerializer)
 
 
-# Create your views here.
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    pagination_class = LimitOffsetPagination
+    serializer_class = CategorySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    permission_classes = [AdminOrSuperUser, AuthorOrReadOnly]
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    pagination_class = LimitOffsetPagination
+    serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    permission_classes = [AdminOrSuperUser, AuthorOrReadOnly]
+
+
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (AuthorOrReadOnly,)
@@ -69,3 +76,4 @@ class CommentViewSet(viewsets.ModelViewSet):
         review = get_object_or_404(Review, pk=review_id)
         serializer.save(author=self.request.user,
                         review=review)
+
