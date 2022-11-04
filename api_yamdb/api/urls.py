@@ -21,3 +21,4 @@ router_v1.register((r'titles/(?P<title_id>\d+)/reviews/'
 
 urlpatterns = [
     path('v1/', include(router_v1.urls)),
+]
