@@ -34,7 +34,7 @@ class TitleSerializer(serializers.ModelSerializer):
         )
 
     def get_rating(self, obj):
-        rating = obj.reviews.aggregate(Avg('estimate')).get('estimate__avg')
+        rating = obj.reviews.aggregate(Avg('estimate ')).get('estimate__avg')
         if not rating:
             return rating
         return round(rating, 1)
@@ -42,7 +42,9 @@ class TitleSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,
-                                          slug_field='username')
+                                          slug_field='username',
+                                          default=(serializers
+                                                   .CurrentUserDefault()))
 
     class Meta:
         fields = '__all__'

@@ -1,7 +1,8 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from .validators import year_validator
-
+from users.models import User
 
 LINE_SLICE = 20
 
@@ -70,15 +71,17 @@ class Title(models.Model):
         'Год создания произведения',
         validators=[year_validator]
     )
-    genre = models.ManyToManyField(
+    genre = models.ForeignKey(
         Genre,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
+        null=True,
         blank=True,
         verbose_name='Жанр произведения'
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
+        null=True,
         blank=True,
         verbose_name='Категория произведения'
     )
@@ -89,4 +92,67 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return str(self.pk)
+        return f'{self.name[:LINE_SLICE]}, {str(self.year)}, {self.category}'
+
+
+class Review(models.Model):
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+    )
+    text = models.TextField(max_length=300)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(
+            fields=['author', 'title'],
+            name='unique_review')
+        ]
+        ordering = ('-created',)
+
+
+class Rating(models.Model):
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='rating',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='rating',
+    )
+    estimation = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(10)]
+    )
+
+    class Meta:
+        constraints = [models.UniqueConstraint(
+            fields=['author', 'title'],
+            name='unique_rate')
+        ]
+
+
+class Comment(models.Model):
+    rewiew = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+    text = models.TextField(max_length=300)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created',)
+

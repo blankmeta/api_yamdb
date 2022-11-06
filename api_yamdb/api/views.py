@@ -8,7 +8,10 @@ from reviews.models import Review, Title, Category, Genre
 from users.permissions import AuthorOrReadOnly, IsAdminOrReadOnly
 from .serializers import (ReviewSerializer, RatingSerializer, CommentSerializer,
                           CategorySerializer, GenreSerializer, TitleSerializer)
-from .fields import TitleFilterBackend
+from .filters import TitleFilterBackend
+from users.permissions import AuthorOrReadOnly, AdminOrSuperUser
+from .serializers import (ReviewSerializer, CommentSerializer,
+                          CategorySerializer, GenreSerializer)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -17,7 +20,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [AdminOrSuperUser, AuthorOrReadOnly]
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -73,7 +76,7 @@ class RatingViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (AuthorOrReadOnly,)
+    permission_classes = (AuthorOrReadOnly, AdminOrSuperUser,)
 
     def get_queryset(self):
         review_id = self.kwargs['review_id']
