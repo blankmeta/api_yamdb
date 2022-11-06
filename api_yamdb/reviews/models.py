@@ -108,7 +108,7 @@ class Review(models.Model):
     )
     text = models.TextField(max_length=300)
     created = models.DateTimeField(auto_now_add=True)
-
+    rate = 
     class Meta:
         constraints = [models.UniqueConstraint(
             fields=['author', 'title'],
