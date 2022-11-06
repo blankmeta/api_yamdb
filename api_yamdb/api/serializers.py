@@ -3,17 +3,17 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from .fields import CategorySlugRelatedField, GenreSlugRelatedField
-from reviews.models import Category, Genre, Title, Review, Rating, Comment
+from reviews.models import Category, Genre, Title, Review, Comment
 
 
-class CategorySerializer(serializers.Model):
-    
+class CategorySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Category
         fields = '__all__'
 
 
-class GenreSerializer(serializers.ModelField):
+class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
@@ -25,7 +25,7 @@ class TitleSerializer(serializers.ModelSerializer):
     category = CategorySlugRelatedField(
         queryset=Category.objects.all(), slug_field='slug')
     genre = GenreSlugRelatedField(
-        queryset=Genre.objects.all(), slug_field='slug', many=True)
+        queryset=Genre.objects.all(), slug_field='slug')
 
     class Meta:
         model = Title

@@ -108,6 +108,9 @@ class Review(models.Model):
     )
     text = models.TextField(max_length=300)
     created = models.DateTimeField(auto_now_add=True)
+    estimation = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(10)]
+    )
 
     class Meta:
         constraints = [models.UniqueConstraint(
@@ -116,27 +119,27 @@ class Review(models.Model):
         ]
         ordering = ('-created',)
 
-
-class Rating(models.Model):
-    title = models.ForeignKey(
-        Title,
-        on_delete=models.CASCADE,
-        related_name='rating',
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='rating',
-    )
-    estimation = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(10)]
-    )
-
-    class Meta:
-        constraints = [models.UniqueConstraint(
-            fields=['author', 'title'],
-            name='unique_rate')
-        ]
+#
+# class Rating(models.Model):
+#     title = models.ForeignKey(
+#         Title,
+#         on_delete=models.CASCADE,
+#         related_name='rating',
+#     )
+#     author = models.ForeignKey(
+#         User,
+#         on_delete=models.CASCADE,
+#         related_name='rating',
+#     )
+#     estimation = models.IntegerField(
+#         validators=[MinValueValidator(0), MaxValueValidator(10)]
+#     )
+#
+#     class Meta:
+#         constraints = [models.UniqueConstraint(
+#             fields=['author', 'title'],
+#             name='unique_rate')
+#         ]
 
 
 class Comment(models.Model):

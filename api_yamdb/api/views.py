@@ -1,17 +1,16 @@
 from statistics import mean
 
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters
 from rest_framework.pagination import LimitOffsetPagination
-from django.shortcuts import get_object_or_404
 
 from reviews.models import Review, Title, Category, Genre
-from users.permissions import AuthorOrReadOnly, IsAdminOrReadOnly
-from .serializers import (ReviewSerializer, RatingSerializer, CommentSerializer,
-                          CategorySerializer, GenreSerializer, TitleSerializer)
+from users.permissions import (AuthorOrReadOnly, IsAdminOrReadOnly,
+                               AdminOrSuperUser)
 from .filters import TitleFilterBackend
-from users.permissions import AuthorOrReadOnly, AdminOrSuperUser
-from .serializers import (ReviewSerializer, CommentSerializer,
-                          CategorySerializer, GenreSerializer)
+from .serializers import (ReviewSerializer, RatingSerializer,
+                          CommentSerializer,
+                          CategorySerializer, GenreSerializer, TitleSerializer)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

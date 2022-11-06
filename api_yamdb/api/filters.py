@@ -1,10 +1,11 @@
+import requests
 from rest_framework import filters
 
 from reviews.models import Genre, Category, Title
 
 
 class TitleFilterBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, qeeryset, request, view):
+    def filter_queryset(self, request: requests.request, queryset, view):
         category_slug = request.query_params.get('category')
         genre_slug = request.query_params.get('genre')
         name = request.query_params.get('name')

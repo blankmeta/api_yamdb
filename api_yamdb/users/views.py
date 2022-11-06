@@ -76,9 +76,8 @@ def send_code_view(request):
         )
 
         return Response(
-            {'message': f'Код подтверждения для получения токена'
-                        f' отправлен на почту '
-                        f'{email}'})
+            {'email': email,
+             'username': username})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
