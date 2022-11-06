@@ -5,9 +5,10 @@ from rest_framework.pagination import LimitOffsetPagination
 from django.shortcuts import get_object_or_404
 
 from reviews.models import Review, Title, Category, Genre
-from users.permissions import AuthorOrReadOnly, AdminOrSuperUser
+from users.permissions import AuthorOrReadOnly, IsAdminOrReadOnly
 from .serializers import (ReviewSerializer, RatingSerializer, CommentSerializer,
-                          CategorySerializer, GenreSerializer)
+                          CategorySerializer, GenreSerializer, TitleSerializer)
+from .fields import TitleFilterBackend
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -16,7 +17,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    permission_classes = [AdminOrSuperUser, AuthorOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -25,7 +26,15 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    permission_classes = [AdminOrSuperUser, AuthorOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [TitleFilterBackend]
+    filterset_fields = ['year', 'category', 'genre', 'name']
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

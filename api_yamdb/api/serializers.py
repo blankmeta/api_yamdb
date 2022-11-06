@@ -2,6 +2,7 @@ from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
+from .fields import CategorySlugRelatedField, GenreSlugRelatedField
 from reviews.models import Category, Genre, Title, Review, Rating, Comment
 
 
@@ -19,11 +20,11 @@ class GenreSerializer(serializers.ModelField):
         fields = '__all__'
 
 
-"""class TitleSerializer(serializers.ModelSerializer):
+class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField('get_rating')
-    category = serializers.SlugRelatedField(
+    category = CategorySlugRelatedField(
         queryset=Category.objects.all(), slug_field='slug')
-    genre = serializers.SlugRelatedField(
+    genre = GenreSlugRelatedField(
         queryset=Genre.objects.all(), slug_field='slug', many=True)
 
     class Meta:
@@ -33,11 +34,11 @@ class GenreSerializer(serializers.ModelField):
         )
 
     def get_rating(self, obj):
-        rating = obj.reviews.aggregate(Avg('estimate ')).get('estimate__avg')
+        rating = obj.reviews.aggregate(Avg('estimate')).get('estimate__avg')
         if not rating:
             return rating
         return round(rating, 1)
-"""
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,

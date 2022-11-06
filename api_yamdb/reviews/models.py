@@ -70,7 +70,7 @@ class Title(models.Model):
         'Год создания произведения',
         validators=[year_validator]
     )
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         Genre,
         on_delete=models.SET_NULL,
         blank=True,
@@ -78,7 +78,7 @@ class Title(models.Model):
     )
     category = models.ForeignKey(
         Category,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         blank=True,
         verbose_name='Категория произведения'
     )
@@ -89,4 +89,4 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return f'{self.name[:LINE_SLICE]}, {str(self.year)}, {self.category}'
+        return str(self.pk)
