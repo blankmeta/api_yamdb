@@ -3,10 +3,12 @@ from statistics import mean
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from reviews.models import Review, Title, Category, Genre
 from users.permissions import (AuthorOrReadOnly, IsAdminOrReadOnly,
-                               AdminOrSuperUser)
+                               AdminOrSuperUser, AdminOrReadOnly,
+                               ModeratorOrReadOnly)
 from .filters import TitleFilterBackend
 from .serializers import (ReviewSerializer, RatingSerializer,
                           CommentSerializer,
@@ -19,7 +21,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    permission_classes = [AdminOrSuperUser, AuthorOrReadOnly]
+    lookup_field = 'slug'
+    permission_classes = [IsAuthenticatedOrReadOnly, AdminOrReadOnly, ]
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -55,27 +58,28 @@ class ReviewViewSet(viewsets.ModelViewSet):
                         title=title)
 
 
-class RatingViewSet(viewsets.ModelViewSet):
-    serializer_class = RatingSerializer
-    permission_classes = (AuthorOrReadOnly,)
-
-    def get_queryset(self):
-        title_id = self.kwargs['title_id']
-        title = get_object_or_404(Title, pk=title_id)
-        estimations = title.rating.all()
-        rate_avg = mean(estimations)
-        return rate_avg
-
-    def perform_create(self, serializer):
-        title_id = self.kwargs['title_id']
-        title = get_object_or_404(Title, pk=title_id)
-        serializer.save(author=self.request.user,
-                        title=title)
+# class RatingViewSet(viewsets.ModelViewSet):
+#     serializer_class = RatingSerializer
+#     permission_classes = (AuthorOrReadOnly,)
+#
+#     def get_queryset(self):
+#         title_id = self.kwargs['title_id']
+#         title = get_object_or_404(Title, pk=title_id)
+#         return title.
+#         # estimations = title.rating.all()
+#         # rate_avg = mean(estimations)
+#         # return rate_avg
+#
+#     def perform_create(self, serializer):
+#         title_id = self.kwargs['title_id']
+#         title = get_object_or_404(Title, pk=title_id)
+#         serializer.save(author=self.request.user,
+#                         title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (AuthorOrReadOnly, AdminOrSuperUser,)
+    permission_classes = (IsAuthenticatedOrReadOnly, ModeratorOrReadOnly or AuthorOrReadOnly, )
 
     def get_queryset(self):
         review_id = self.kwargs['review_id']

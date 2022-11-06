@@ -1,8 +1,8 @@
-from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models
 
-from .validators import year_validator
 from users.models import User
+from .validators import year_validator
 
 LINE_SLICE = 20
 
@@ -13,7 +13,7 @@ class Category(models.Model):
     Произведения делятся на категории: «Книги», «Фильмы», «Музыка».
     Список категорий может быть расширен администратором.
     """
-    name =  models.CharField(
+    name = models.CharField(
         'Название категории',
         max_length=200
     )
@@ -37,7 +37,7 @@ class Genre(models.Model):
     Произведения делятся на жанры из числа предустановленных.
     Список жанров может быть расширен администратором.
     """
-    name =  models.CharField(
+    name = models.CharField(
         'Название жанра',
         max_length=200
     )
@@ -73,14 +73,14 @@ class Title(models.Model):
     )
     genre = models.ForeignKey(
         Genre,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         verbose_name='Жанр произведения'
     )
     category = models.ForeignKey(
         Category,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         verbose_name='Категория произведения'
@@ -108,7 +108,7 @@ class Review(models.Model):
     )
     text = models.TextField(max_length=300)
     created = models.DateTimeField(auto_now_add=True)
-    estimation = models.IntegerField(
+    score = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(10)]
     )
 
@@ -118,6 +118,7 @@ class Review(models.Model):
             name='unique_review')
         ]
         ordering = ('-created',)
+
 
 #
 # class Rating(models.Model):
@@ -143,7 +144,7 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
-    rewiew = models.ForeignKey(
+    review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         related_name='comments',
@@ -154,8 +155,7 @@ class Comment(models.Model):
         related_name='comments',
     )
     text = models.TextField(max_length=300)
-    created = models.DateTimeField(auto_now_add=True)
+    pub_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ('-created',)
-
+        ordering = ('-pub_date',)

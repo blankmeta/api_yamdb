@@ -20,3 +20,8 @@ class GenreSlugRelatedField(serializers.SlugRelatedField):
     def get_genres_slugs():
         genres_slugs = [genre.slug for genre in Genre.objects.all()]
         return genres_slugs
+
+
+# class ReviewSlugRelatedField(serializers.SlugRelatedField):
+#     def to_representation(self, ):
+#         return author.username
