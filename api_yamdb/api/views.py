@@ -19,6 +19,18 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [AdminOrSuperUser, AuthorOrReadOnly]
 
 
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    pagination_class = LimitOffsetPagination
+    serializer_class = CategorySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    permission_classes = [AdminOrSuperUser, AuthorOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user,)
+
+
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     pagination_class = LimitOffsetPagination

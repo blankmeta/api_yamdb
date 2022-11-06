@@ -87,7 +87,7 @@ class Migration(migrations.Migration):
                 ('text', models.TextField(max_length=300)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to=settings.AUTH_USER_MODEL)),
-                ('rewiew', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='reviews.Review')),
+                ('review', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='reviews.Review')),
             ],
             options={
                 'ordering': ('-created',),
