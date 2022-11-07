@@ -71,12 +71,17 @@ class Title(models.Model):
         'Год создания произведения',
         validators=[year_validator]
     )
-    genre = models.ForeignKey(
+    # genre = models.ForeignKey(
+    #     Genre,
+    #     on_delete=models.SET_NULL,
+    #     null=True,
+    #     blank=True,
+    #     verbose_name='Жанр произведения'
+    # )
+    genre = models.ManyToManyField(
         Genre,
-        on_delete=models.SET_NULL,
-        null=True,
         blank=True,
-        verbose_name='Жанр произведения'
+        related_name='genre'
     )
     category = models.ForeignKey(
         Category,

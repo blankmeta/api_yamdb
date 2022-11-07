@@ -93,6 +93,15 @@ class Test04TitleAPI:
             'Значение параметра `results` неправильное, значение `category` неправильное '
             'или не сохранилось при POST запросе.'
         )
+        print()
+        print('!!!___genres__!!!')
+        print(genres)
+        print()
+        print()
+        print('!!!___genres[0]__!!!')
+        print(genres[0])
+        print('!!!___title.get(genre, [])___!!!')
+        print(title.get('genre', []))
         assert genres[0] in title.get('genre', []) and genres[1] in title.get('genre', []), (
             'Проверьте, что при GET запросе `/api/v1/titles/` возвращаете данные с пагинацией. '
             'Значение параметра `results` неправильное, значение `genre` неправильное '

@@ -24,7 +24,7 @@ class TitleSerializer(serializers.ModelSerializer):
     category = CategorySlugRelatedField(
         queryset=Category.objects.all(), slug_field='slug')
     genre = GenreSlugRelatedField(
-        queryset=Genre.objects.all(), slug_field='slug')
+        queryset=Genre.objects.all(), slug_field='slug', many=True)
 
     class Meta:
         model = Title
@@ -87,7 +87,8 @@ class RatingSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,
-                                          slug_field='username')
+                                          slug_field='username',
+                                          default=serializers.CurrentUserDefault())
 
     class Meta:
         fields = '__all__'
