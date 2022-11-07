@@ -1,16 +1,14 @@
-from statistics import mean
-
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters, status
+from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from reviews.models import Review, Title, Category, Genre
-from users.permissions import (AuthorOrReadOnly, IsAdminOrReadOnly,
-                               IsAdminOrSuperUser, AdminOrReadOnly,
-                               IsStaffOrAuthorOrReadOnly, IsAuthOrAuthorOrReadOnly)
+from users.permissions import (IsAdminOrReadOnly,
+                               IsAdminOrSuperUser, AdminOrSuperuserOrReadOnly,
+                               IsStaffOrAuthorOrReadOnly)
 from .filters import TitleFilterBackend
 from .serializers import (ReviewSerializer,
                           CommentSerializer,
@@ -22,9 +20,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('name', )
-    lookup_field = 'slug'
-    permission_classes = [IsAuthenticatedOrReadOnly, AdminOrReadOnly, ]
+    search_fields = ('name',)
+    # lookup_field = 'slug'
+    permission_classes = [IsAuthenticatedOrReadOnly,
+                          AdminOrSuperuserOrReadOnly, ]
 
     @action(
         detail=False, methods=['delete'],

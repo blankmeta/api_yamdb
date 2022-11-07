@@ -112,7 +112,7 @@ class Review(models.Model):
         related_name='reviews',
     )
     text = models.TextField(max_length=300)
-    created = models.DateTimeField(auto_now_add=True)
+    pub_date = models.DateTimeField(auto_now_add=True)
     score = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(10)]
     )
@@ -122,7 +122,7 @@ class Review(models.Model):
             fields=['author', 'title'],
             name='unique_review')
         ]
-        ordering = ('-created',)
+        ordering = ('-pub_date',)
 
 
 #
