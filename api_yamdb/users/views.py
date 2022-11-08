@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import User
-from .permissions import AdminOrSuperUser, IsAdminOrSuperUser, IsAuthor
+from .permissions import (AdminOrSuperUser, IsAdminOrSuperUser,
+                          IsAuthor)
 from .serializers import (SignUpSerializer, GetTokenSerializer, UserSerializer,
                           UserPatchSerializer)
 from .tokens import get_tokens_for_user, account_activation_token
@@ -76,9 +77,8 @@ def send_code_view(request):
         )
 
         return Response(
-            {'message': f'Код подтверждения для получения токена'
-                        f' отправлен на почту '
-                        f'{email}'})
+            {'email': email,
+             'username': username})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

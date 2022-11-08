@@ -14,3 +14,32 @@ class IsAuthor(permissions.BasePermission):
 class AdminOrSuperUser(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.role == 'admin' or request.user.is_superuser
+
+
+class AdminOrSuperuserOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user.role == 'admin' or request.user.is_superuser
+
+
+class IsAdminOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.user.is_authenticated:
+            return bool(
+                request.user.role == 'admin' or request.user.is_superuser)
+
+
+class IsStaffOrAuthorOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.user.is_authenticated:
+            return (obj.author == request.user or request.user.role in (
+                'admin', 'moderator') or request.user.is_superuser)
+
+    def has_permission(self, request, view):
+        return (request.method in permissions.SAFE_METHODS
+                or request.user.is_authenticated)
