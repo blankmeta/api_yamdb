@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, mixins
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -15,50 +15,73 @@ from .serializers import (ReviewSerializer,
                           CategorySerializer, GenreSerializer, TitleSerializer)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+# class CategoryViewSet(viewsets.ModelViewSet):
+#     queryset = Category.objects.all()
+#     pagination_class = LimitOffsetPagination
+#     serializer_class = CategorySerializer
+#     filter_backends = (filters.SearchFilter,)
+#     search_fields = ('name',)
+#     lookup_field = 'slug'
+#     permission_classes = [IsAuthenticatedOrReadOnly,
+#                           AdminOrSuperuserOrReadOnly, ]
+
+#     @action(
+#         detail=False, methods=['delete'],
+#         url_path=r'(?P<slug>\w+)',
+#         lookup_field='slug', url_name='category_slug'
+#     )
+    
+#     def get_category(self, request, slug):
+#         category = self.get_object()
+#         serializer = CategorySerializer(category)
+#         category.delete()
+#         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+
+class CategoryViewSet(mixins.ListModelMixin,
+                      mixins.CreateModelMixin,
+                      mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet,):
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
     queryset = Category.objects.all()
-    pagination_class = LimitOffsetPagination
     serializer_class = CategorySerializer
+
+
+# class GenreViewSet(viewsets.ModelViewSet):
+#     queryset = Genre.objects.all()
+#     pagination_class = LimitOffsetPagination
+#     serializer_class = GenreSerializer
+#     filter_backends = (filters.SearchFilter,)
+#     search_fields = ('name',)
+#     permission_classes = [IsAdminOrSuperUser, IsAdminOrReadOnly, ]
+
+#     @action(
+#         detail=False, methods=['delete'],
+#         url_path=r'(?P<slug>\w+)',
+#         lookup_field='slug', url_name='category_slug'
+#     )
+#     def get_genre(self, request, slug):
+#         category = self.get_object()
+#         serializer = CategorySerializer(category)
+#         category.delete()
+#         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+
+class GenreViewSet(mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   mixins.DestroyModelMixin,
+                   viewsets.GenericViewSet,):
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    # lookup_field = 'slug'
-    permission_classes = [IsAuthenticatedOrReadOnly,
-                          AdminOrSuperuserOrReadOnly, ]
-
-    @action(
-        detail=False, methods=['delete'],
-        url_path=r'(?P<slug>\w+)',
-        lookup_field='slug', url_name='category_slug'
-    )
-    def get_category(self, request, slug):
-        category = self.get_object()
-        serializer = CategorySerializer(category)
-        category.delete()
-        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
-
-
-class GenreViewSet(viewsets.ModelViewSet):
+    lookup_field = 'slug'
     queryset = Genre.objects.all()
-    pagination_class = LimitOffsetPagination
     serializer_class = GenreSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    permission_classes = [IsAdminOrSuperUser, IsAdminOrReadOnly, ]
-
-    @action(
-        detail=False, methods=['delete'],
-        url_path=r'(?P<slug>\w+)',
-        lookup_field='slug', url_name='category_slug'
-    )
-    def get_genre(self, request, slug):
-        category = self.get_object()
-        serializer = CategorySerializer(category)
-        category.delete()
-        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.select_related('category').all()
     serializer_class = TitleSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [TitleFilterBackend]
