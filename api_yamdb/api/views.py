@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters, status, mixins
 from rest_framework.decorators import action
@@ -12,7 +13,8 @@ from users.permissions import (IsAdminOrReadOnly,
 from .filters import TitleFilterBackend
 from .serializers import (ReviewSerializer,
                           CommentSerializer,
-                          CategorySerializer, GenreSerializer, TitleSerializer)
+                          CategorySerializer, GenreSerializer,
+                          TitleSerializer, TitlePostSerializer)
 
 
 # class CategoryViewSet(viewsets.ModelViewSet):
@@ -81,11 +83,21 @@ class GenreViewSet(mixins.ListModelMixin,
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.select_related('category').all()
+    queryset = Title.objects.all()
     serializer_class = TitleSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [TitleFilterBackend]
     filterset_fields = ['year', 'category', 'genre', 'name']
+
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return TitleSerializer
+        return TitlePostSerializer
+
+    def get_queryset(self):
+        queryset = Title.objects.annotate(
+            rating=Avg('reviews__score')).order_by('id')
+        return queryset
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -112,19 +124,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         return get_object_or_404(Review, id=self.kwargs.get('review_id'))
 
     def get_queryset(self):
-        review_id = self.kwargs['review_id']
-        review = get_object_or_404(Review, pk=review_id)
-        return review.comments.all()
+        return self.get_review().comments.all()
 
     def perform_create(self, serializer):
-        review_id = self.kwargs['review_id']
-        review = get_object_or_404(Review, pk=review_id)
         serializer.save(author=self.request.user,
-                        review=review)
-
-    # def perform_update(self, serializer):
-    #     review_id = self.kwargs['review_id']
-    #     review = get_object_or_404(Review, pk=review_id)
-    #     if review.author == self.request.user:
-    #         serializer.save()
-    #     return status.HTTP_403_FORBIDDEN
+                        review=self.get_review())
