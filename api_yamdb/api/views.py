@@ -1,11 +1,13 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters, status, mixins
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 
 from reviews.models import Review, Title, Category, Genre
-from users.permissions import (IsAdminOrReadOnly,
+from users.permissions import (IsAdminOrReadOnly, IsAuthorOrReadOnly,
                                IsAdminOrSuperUser, AdminOrSuperuserOrReadOnly,
-                               IsStaffOrAuthorOrReadOnly, IsAuthor, IsModer, IsAdmin)
+                               IsStaffOrAuthorOrReadOnly, IsModer, IsAdmin)
+
 from .filters import TitleFilterBackend
 from .serializers import (ReviewSerializer,
                           CommentSerializer,
@@ -23,7 +25,6 @@ class CategoryViewSet(mixins.ListModelMixin,
     lookup_field = 'slug'
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
 
 
 class GenreViewSet(mixins.ListModelMixin,
@@ -58,7 +59,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (IsModer, IsAuthor, IsAdmin,)
+    permission_classes = (IsModer | IsAdmin | IsAuthorOrReadOnly,)
 
     def get_queryset(self):
         title_id = self.kwargs['title_id']
@@ -74,7 +75,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsModer, IsAuthor, IsAdmin,)
+    permission_classes = (IsModer, IsAuthorOrReadOnly, IsAdmin,)
 
     def get_review(self):
         return get_object_or_404(Review, id=self.kwargs.get('review_id'))
