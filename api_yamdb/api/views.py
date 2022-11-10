@@ -4,9 +4,10 @@ from rest_framework import viewsets, filters, status, mixins
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 
 from reviews.models import Review, Title, Category, Genre
-from users.permissions import (IsAdminOrReadOnly, IsAuthorOrReadOnly,
+from users.permissions import (IsAdminOrReadOnly, IsAuthorOrReadOnly, TestIsAuthorOrReadOnly,
                                IsAdminOrSuperUser, AdminOrSuperuserOrReadOnly,
-                               IsStaffOrAuthorOrReadOnly, IsModer, IsAdmin)
+                               IsStaffOrAuthorOrReadOnly, IsModer, IsAdmin,
+                               TestIsRoleAdmin, TestIsRoleModerator, TestReadOnly)
 
 from .filters import TitleFilterBackend
 from .serializers import (ReviewSerializer,
@@ -59,7 +60,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (IsModer | IsAdmin | IsAuthorOrReadOnly,)
+    permission_classes = (TestIsRoleAdmin | TestIsRoleModerator | TestIsAuthorOrReadOnly,)
 
     def get_queryset(self):
         title_id = self.kwargs['title_id']
@@ -75,7 +76,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsModer, IsAuthorOrReadOnly, IsAdmin,)
+    permission_classes = (TestIsRoleAdmin | TestIsRoleModerator | TestIsAuthorOrReadOnly,)
 
     def get_review(self):
         return get_object_or_404(Review, id=self.kwargs.get('review_id'))
