@@ -1,13 +1,10 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, filters, status, mixins
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework import viewsets, filters, mixins
 
 from reviews.models import Review, Title, Category, Genre
-from users.permissions import (IsAdminOrReadOnly, IsAuthorOrReadOnly, TestIsAuthorOrReadOnly,
-                               IsAdminOrSuperUser, AdminOrSuperuserOrReadOnly,
-                               IsStaffOrAuthorOrReadOnly, IsModer, IsAdmin,
-                               TestIsRoleAdmin, TestIsRoleModerator, TestReadOnly)
+from users.permissions import (IsAuthor, ReadOnly, SafeMethods,
+                               IsAdmin, IsModerator)
 
 from .filters import TitleFilterBackend
 from .serializers import (ReviewSerializer,
@@ -20,7 +17,7 @@ class CategoryViewSet(mixins.ListModelMixin,
                       mixins.CreateModelMixin,
                       mixins.DestroyModelMixin,
                       viewsets.GenericViewSet,):
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdmin | ReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -32,7 +29,7 @@ class GenreViewSet(mixins.ListModelMixin,
                    mixins.CreateModelMixin,
                    mixins.DestroyModelMixin,
                    viewsets.GenericViewSet,):
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdmin | ReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -43,7 +40,7 @@ class GenreViewSet(mixins.ListModelMixin,
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = (IsAdmin | ReadOnly,)
     filter_backends = [TitleFilterBackend]
     filterset_fields = ['year', 'category', 'genre', 'name']
 
@@ -60,7 +57,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (TestIsRoleAdmin | TestIsRoleModerator | TestIsAuthorOrReadOnly,)
+    permission_classes = (IsAdmin | IsModerator | IsAuthor | SafeMethods,)
 
     def get_queryset(self):
         title_id = self.kwargs['title_id']
@@ -76,7 +73,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (TestIsRoleAdmin | TestIsRoleModerator | TestIsAuthorOrReadOnly,)
+    permission_classes = (IsAdmin | IsModerator | IsAuthor | SafeMethods,)
 
     def get_review(self):
         return get_object_or_404(Review, id=self.kwargs.get('review_id'))

@@ -7,8 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import User
-from .permissions import (AdminOrSuperUser, IsAdminOrSuperUser, TestIsRoleAdmin,
-                          IsAuthorOrReadOnly)
+from .permissions import (IsAdminOrSuperUserList, IsAdminOrSuperUser,
+                          IsAuthor)
 from .serializers import (SignUpSerializer, GetTokenSerializer, UserSerializer,
                           UserPatchSerializer)
 from .tokens import get_tokens_for_user, account_activation_token
@@ -19,14 +19,15 @@ class UserList(generics.ListCreateAPIView):
     search_fields = ('username',)
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated, AdminOrSuperUser,)
+    permission_classes = (IsAuthenticated, IsAdminOrSuperUserList,)
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated, IsAdminOrSuperUser or IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthenticated, IsAdminOrSuperUser
+                          or IsAuthor,)
 
     def update(self, request, *args, **kwargs):
         # Переопределяем сериализатор, если роль - юзер
