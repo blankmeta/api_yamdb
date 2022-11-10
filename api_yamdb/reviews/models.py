@@ -71,17 +71,11 @@ class Title(models.Model):
         'Год создания произведения',
         validators=[year_validator]
     )
-    # genre = models.ForeignKey(
-    #     Genre,
-    #     on_delete=models.SET_NULL,
-    #     null=True,
-    #     blank=True,
-    #     verbose_name='Жанр произведения'
-    # )
     genre = models.ManyToManyField(
         Genre,
         blank=True,
-        related_name='genre'
+        related_name='genre',
+        verbose_name='Жанр произведения'
     )
     category = models.ForeignKey(
         Category,
@@ -123,29 +117,6 @@ class Review(models.Model):
             name='unique_review')
         ]
         ordering = ('-pub_date',)
-
-
-#
-# class Rating(models.Model):
-#     title = models.ForeignKey(
-#         Title,
-#         on_delete=models.CASCADE,
-#         related_name='rating',
-#     )
-#     author = models.ForeignKey(
-#         User,
-#         on_delete=models.CASCADE,
-#         related_name='rating',
-#     )
-#     estimation = models.IntegerField(
-#         validators=[MinValueValidator(0), MaxValueValidator(10)]
-#     )
-#
-#     class Meta:
-#         constraints = [models.UniqueConstraint(
-#             fields=['author', 'title'],
-#             name='unique_rate')
-#         ]
 
 
 class Comment(models.Model):

@@ -1,43 +1,17 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters, status, mixins
-from rest_framework.decorators import action
-from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.response import Response
 
 from reviews.models import Review, Title, Category, Genre
 from users.permissions import (IsAdminOrReadOnly,
                                IsAdminOrSuperUser, AdminOrSuperuserOrReadOnly,
-                               IsStaffOrAuthorOrReadOnly)
+                               IsStaffOrAuthorOrReadOnly, IsAuthor, IsModer, IsAdmin)
 from .filters import TitleFilterBackend
 from .serializers import (ReviewSerializer,
                           CommentSerializer,
                           CategorySerializer, GenreSerializer,
                           TitleSerializer, TitlePostSerializer)
 
-
-# class CategoryViewSet(viewsets.ModelViewSet):
-#     queryset = Category.objects.all()
-#     pagination_class = LimitOffsetPagination
-#     serializer_class = CategorySerializer
-#     filter_backends = (filters.SearchFilter,)
-#     search_fields = ('name',)
-#     lookup_field = 'slug'
-#     permission_classes = [IsAuthenticatedOrReadOnly,
-#                           AdminOrSuperuserOrReadOnly, ]
-
-#     @action(
-#         detail=False, methods=['delete'],
-#         url_path=r'(?P<slug>\w+)',
-#         lookup_field='slug', url_name='category_slug'
-#     )
-    
-#     def get_category(self, request, slug):
-#         category = self.get_object()
-#         serializer = CategorySerializer(category)
-#         category.delete()
-#         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 class CategoryViewSet(mixins.ListModelMixin,
                       mixins.CreateModelMixin,
@@ -51,24 +25,6 @@ class CategoryViewSet(mixins.ListModelMixin,
     serializer_class = CategorySerializer
 
 
-# class GenreViewSet(viewsets.ModelViewSet):
-#     queryset = Genre.objects.all()
-#     pagination_class = LimitOffsetPagination
-#     serializer_class = GenreSerializer
-#     filter_backends = (filters.SearchFilter,)
-#     search_fields = ('name',)
-#     permission_classes = [IsAdminOrSuperUser, IsAdminOrReadOnly, ]
-
-#     @action(
-#         detail=False, methods=['delete'],
-#         url_path=r'(?P<slug>\w+)',
-#         lookup_field='slug', url_name='category_slug'
-#     )
-#     def get_genre(self, request, slug):
-#         category = self.get_object()
-#         serializer = CategorySerializer(category)
-#         category.delete()
-#         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
 
 class GenreViewSet(mixins.ListModelMixin,
                    mixins.CreateModelMixin,
@@ -102,7 +58,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (IsStaffOrAuthorOrReadOnly,)
+    permission_classes = (IsModer, IsAuthor, IsAdmin,)
 
     def get_queryset(self):
         title_id = self.kwargs['title_id']
@@ -118,7 +74,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsStaffOrAuthorOrReadOnly,)
+    permission_classes = (IsModer, IsAuthor, IsAdmin,)
 
     def get_review(self):
         return get_object_or_404(Review, id=self.kwargs.get('review_id'))

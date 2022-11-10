@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'users.apps.UsersConfig',
+
     'api',
     'reviews',
 ]
