@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-roles = (
+ROLES = (
     ('user', 'user'),
     ('moderator', 'moderator'),
     ('admin', 'admin'),
@@ -15,14 +15,14 @@ class User(AbstractUser):
         blank=True,
     )
     role = models.CharField(
-        choices=roles,
+        choices=ROLES,
         default='user',
         max_length=10,
     )
 
     @property
     def is_admin(self):
-        return self.role == 'admin'
+        return self.role == 'admin' or self.is_superuser
 
     @property
     def is_moderator(self):

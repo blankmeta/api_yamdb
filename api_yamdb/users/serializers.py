@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from users.models import User, roles
+from users.models import User, ROLES
 from users.tokens import account_activation_token
 
 
@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=150, required=False)
     last_name = serializers.CharField(max_length=150, required=False)
     bio = serializers.CharField(required=False)
-    role = serializers.ChoiceField(choices=roles, default='user',
+    role = serializers.ChoiceField(choices=ROLES, default='user',
                                    required=False)
 
     class Meta:
@@ -35,7 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserPatchSerializer(UserSerializer):
-    role = serializers.ChoiceField(choices=roles, default='user',
+    role = serializers.ChoiceField(choices=ROLES, default='user',
                                    required=False, read_only=True)
 
 
