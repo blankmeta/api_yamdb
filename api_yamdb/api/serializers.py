@@ -55,10 +55,10 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ('title',)
 
     def validate(self, data):
-        request = self.context['request']
-        title = get_object_or_404(Title,
-                                  id=self.context.get("view").kwargs.get(
-                                      "title_id"))
+        request = self.context.get('request')
+        title = get_object_or_404(
+            Title, id=self.context.get("view").kwargs.get("title_id")
+        )
         if request.method == 'POST':
             if Review.objects.filter(title=title,
                                      author=request.user).exists():
