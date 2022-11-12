@@ -43,10 +43,11 @@ class TitlePostSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(read_only=True,
-                                          slug_field='username',
-                                          default=(serializers
-                                                   .CurrentUserDefault()))
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        default=(serializers.CurrentUserDefault())
+    )
 
     class Meta:
         fields = ('id', 'title', 'author', 'text', 'pub_date', 'score',)

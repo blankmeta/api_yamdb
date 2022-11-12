@@ -43,7 +43,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_fields = ['year', 'category', 'genre', 'name']
 
     def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'retrieve':
+        if self.action in ['list', 'retrieve']:
             return TitleSerializer
         return TitlePostSerializer
 
@@ -56,17 +56,18 @@ class TitleViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (IsAdminOrReadOnly | IsModerator | IsAuthor,)
+    
+    def get_title(self):
+        title_id = self.kwargs['title_id']
+        title = get_object_or_404(Title, pk=title_id)
+        return title
 
     def get_queryset(self):
-        title_id = self.kwargs['title_id']
-        title = get_object_or_404(Title, pk=title_id)
-        return title.reviews.all()
+        return self.get_title().reviews.all()
 
     def perform_create(self, serializer):
-        title_id = self.kwargs['title_id']
-        title = get_object_or_404(Title, pk=title_id)
         serializer.save(author=self.request.user,
-                        title=title)
+                        title=self.get_title())
 
 
 class CommentViewSet(viewsets.ModelViewSet):
