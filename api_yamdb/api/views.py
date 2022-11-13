@@ -34,9 +34,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = (
         Title
         .objects
-        .select_related('genre')
-        .select_related('category')
-        .all()
+        .select_related('genre', 'category')
     )
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -83,7 +81,7 @@ class CommentViewSet(viewsets.ModelViewSet):
                                  id=self.kwargs.get('review_id'))
 
     def get_queryset(self):
-        return self.get_review().comments.all()
+        return self.get_review().comments.select_related('author').all()
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, review=self.get_review())
